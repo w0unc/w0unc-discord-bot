@@ -1,0 +1,28 @@
+'use strict';
+
+
+const config = {
+	// The Discord bot owner IDs. An array of strings.
+	owner: [''],
+
+	// The Discord bot token. Can be found at: https://discordapp.com/developers/applications.
+	token: '',
+
+	// The default bot command prefix. Set to '%' by default.
+	commandPrefix: '%',
+
+	// Disables the bots ability to mention everyone. Set to true by default.
+	disableEveryone: true,
+
+	// The Discord bot support server invite code.
+	invite: '',
+
+	// Weatherstack API Key.
+	weatherstackAPIKey: '',
+
+	// APRS API Key.
+	aprsAPIKey: '',
+};
+
+
+module.exports = config;
