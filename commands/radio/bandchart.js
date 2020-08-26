@@ -6,7 +6,7 @@ const { Command } = require('discord.js-commando');
 
 
 // Command that gets the ARRL Band Chart.
-module.exports = class DTMF extends Command {
+module.exports = class BandChart extends Command {
 	constructor(client) {
 		super(client, {
 			name: 'bandchart',
@@ -21,7 +21,7 @@ module.exports = class DTMF extends Command {
 		});
 	}
 
-	// The main run function of the DTMF command.
+	// The main run function of the BandChart command.
 	async run(msg) {
 		// Reply to the user.
 		return msg.reply({ files: ['media/bandchart.jpg'] });

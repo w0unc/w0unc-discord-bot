@@ -20,6 +20,9 @@ const config = {
 	// Weatherstack API Key.
 	weatherstackAPIKey: '',
 
+	// HERE API Key.
+	hereAPIKey: '',
+
 	// APRS API Key.
 	aprsAPIKey: '',
 };

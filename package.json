@@ -1,5 +1,5 @@
 {
-	"name": "W0UNC",
+	"name": "w0unc",
 	"description": "A Discord bot built for the WØUNC Amateur Radio Discord",
 	"author": "Bondanr <bondanrgames@gmail.com>",
 	"version": "1.0.0",
@@ -13,7 +13,7 @@
 		"node": ">=12.0.0"
 	},
 	"dependencies": {
-		"discord.js": "^12.2.0",
+		"discord.js": "^12.3.1",
 		"discord.js-commando": "discordjs/commando",
 		"moment": "^2.27.0",
 		"moment-duration-format": "^2.3.2",
@@ -24,6 +24,6 @@
 		"wget-improved": "^3.2.1"
 	},
 	"devDependencies": {
-		"eslint": "^7.6.0"
+		"eslint": "^7.7.0"
 	}
 }
