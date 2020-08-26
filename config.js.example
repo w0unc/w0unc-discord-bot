@@ -9,7 +9,7 @@ const config = {
 	token: '',
 
 	// The default bot command prefix. Set to '%' by default.
-	commandPrefix: '%',
+	commandPrefix: ';',
 
 	// Disables the bots ability to mention everyone. Set to true by default.
 	disableEveryone: true,

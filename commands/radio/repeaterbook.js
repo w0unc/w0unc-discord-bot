@@ -93,7 +93,7 @@ module.exports = class RepeaterBook extends Command {
 				for (let i = 0; i < data.count; i++) {
 					repeaters += `(${i + 1}) ${data.results[i].Callsign} - ${data.results[i].Frequency} - `;
 
-					if (data.results[i]['Analog Capable'] === 'Yes' ||
+					if (data.results[i]['FM Analog'] === 'Yes' ||
 					(data.results[i].DMR === 'No' && data.results[i]['D-Star'] === 'No' &&
 					data.results[i]['APCO P-25'] === 'No' && data.results[i]['System Fusion'] === 'No')) {
 						modes.push('Analog');
@@ -153,7 +153,7 @@ module.exports = class RepeaterBook extends Command {
 			sendEmbed.addField('INPUT FREQUENCY', `${data.results[index]['Input Freq']} (${(data.results[index]['Input Freq'] - data.results[index].Frequency).toLocaleString(undefined, { maximumFractionDigits: 1, minimumFractionDigits: 1 })} MHz)`, true);
 
 			// Tones.
-			let tones = 'None';
+			let tones;
 
 			if (data.results[index].PL) {
 				tones = `${data.results[index].PL} In`;
@@ -163,6 +163,9 @@ module.exports = class RepeaterBook extends Command {
 			}
 			else if (data.results[index].TSQ) {
 				tones += `${data.results[index].TSQ} Out`;
+			}
+			else {
+				tones = 'None';
 			}
 
 			sendEmbed.addField('TONES', tones, true);
@@ -184,14 +187,21 @@ module.exports = class RepeaterBook extends Command {
 			// Modes.
 			const modes = [];
 
-			if (data.results[index]['Analog Capable'] === 'Yes' ||
+			if (data.results[index]['FM Analog'] === 'Yes' ||
 			(data.results[index].DMR === 'No' && data.results[index]['D-Star'] === 'No' &&
 			data.results[index]['APCO P-25'] === 'No' && data.results[index]['System Fusion'] === 'No')) {
 				modes.push('Analog');
 			}
 
 			if (data.results[index].DMR === 'Yes') {
-				modes.push('DMR');
+				let dmr = 'DMR';
+				if (data.results[index]['DMR Color Code']) {
+					dmr += ` (CC${data.results[index]['DMR Color Code']})`;
+				}
+				if (data.results[index]['DMR ID']) {
+					dmr += ` (${data.results[index]['DMR ID']})`;
+				}
+				modes.push(dmr);
 			}
 
 			if (data.results[index]['D-Star'] === 'Yes') {
@@ -199,7 +209,11 @@ module.exports = class RepeaterBook extends Command {
 			}
 
 			if (data.results[index]['APCO P-25'] === 'Yes') {
-				modes.push('P25');
+				let p25 = 'P25';
+				if (data.results[index]['P-25 NAC'] !== '') {
+					p25 += ` (${data.results[index]['P-25 NAC']})`;
+				}
+				modes.push(p25);
 			}
 
 			if (data.results[index]['System Fusion'] === 'Yes') {
@@ -211,20 +225,20 @@ module.exports = class RepeaterBook extends Command {
 			// Nodes.
 			const nodes = [];
 
-			if (data.results[index]['AllStar Node'] === 'Yes') {
-				nodes.push('AllStar');
+			if (data.results[index]['AllStar Node'] != false) {
+				nodes.push(`AllStar (${data.results[index]['AllStar Node']})`);
 			}
 
-			if (data.results[index]['EchoLink Node'] !== '') {
+			if (data.results[index]['EchoLink Node'] != false) {
 				nodes.push(`EchoLink (${data.results[index]['EchoLink Node']})`);
 			}
 
-			if (data.results[index]['IRLP Node'] === 'Yes') {
-				nodes.push('IRLP');
+			if (data.results[index]['IRLP Node'] != false) {
+				nodes.push(`IRLP (${data.results[index]['IRLP Node']})`);
 			}
 
-			if (data.results[index]['Wires Node'] === 'Yes') {
-				nodes.push('Wires');
+			if (data.results[index]['Wires Node'] != false) {
+				nodes.push(`Wires (${data.results[index]['Wires Node']})`);
 			}
 
 			if (nodes.length !== 0) {
