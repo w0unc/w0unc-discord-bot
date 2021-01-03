@@ -10,20 +10,20 @@
 	"license": "MIT",
 	"main": "index.js",
 	"engines": {
-		"node": ">=12.0.0"
+		"node": ">=15.5.0"
 	},
 	"dependencies": {
 		"discord.js": "^12.3.1",
 		"discord.js-commando": "discordjs/commando",
-		"moment": "^2.27.0",
+		"moment": "^2.29.1",
 		"moment-duration-format": "^2.3.2",
 		"moment-timezone": "^0.5.31",
 		"rss-parser": "^3.9.0",
-		"sqlite": "^4.0.14",
+		"sqlite": "^4.0.15",
 		"sqlite3": "^5.0.0",
 		"wget-improved": "^3.2.1"
 	},
 	"devDependencies": {
-		"eslint": "^7.7.0"
+		"eslint": "^7.10.0"
 	}
 }
