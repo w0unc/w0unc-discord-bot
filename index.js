@@ -248,7 +248,7 @@ client.on('guildCreate', guild => {
 	// Logs the event.
 	client.logger.log([
 		`Server: ${guild} (${guild.id})`,
-		`Owner: ${guild.owner.user.tag} (${guild.owner.id})`,
+		//`Owner: ${guild.owner.user.tag} (${guild.owner.id})`,
 		`Channels: ${guild.channels.cache.filter(channel => channel.type !== 'dm' && channel.type !== 'category').size}`,
 		`Users: ${guild.members.cache.filter(member => !member.user.bot).size}`,
 	].join(' | '), 'gjoin');
@@ -263,7 +263,7 @@ client.on('guildDelete', guild => {
 	// Logs the event.
 	client.logger.log([
 		`Server: ${guild} (${guild.id})`,
-		`Owner: ${guild.owner.user.tag} (${guild.owner.id})`,
+		//`Owner: ${guild.owner.user.tag} (${guild.owner.id})`,
 		`Users: ${guild.members.cache.filter(member => !member.user.bot).size}`,
 	].join(' | '), 'gleft');
 });
