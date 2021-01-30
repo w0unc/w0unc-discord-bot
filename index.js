@@ -160,54 +160,54 @@ client.on('message', (msg) => {
 	}
 
 	// Reddit.
-	if (content.match(/reddit/gi)) {
-		const comment = new RegExp(/(http[s]?:\/\/)?(www\.)?reddit\.[\w.]+\/r\/[\w]+\/comments\/[\w]{6}\/[\w]+\/[\w]{7}/gi);
-		const thread = new RegExp(/(?<=(http[s]?:\/\/)?(www\.)?reddit\.[\w.]+\/r\/[\w]+\/comments\/)([\w]{6})(?=\/[\w]+[/]?([^\S]+|$))/gi);
+	// if (content.match(/reddit/gi)) {
+	// 	const comment = new RegExp(/(http[s]?:\/\/)?(www\.)?reddit\.[\w.]+\/r\/[\w]+\/comments\/[\w]{6}\/[\w]+\/[\w]{7}/gi);
+	// 	const thread = new RegExp(/(?<=(http[s]?:\/\/)?(www\.)?reddit\.[\w.]+\/r\/[\w]+\/comments\/)([\w]{6})(?=\/[\w]+[/]?([^\S]+|$))/gi);
 
-		if (content.match(comment)) {
-			const result = content.match(comment);
-			const results = [];
+	// 	if (content.match(comment)) {
+	// 		const result = content.match(comment);
+	// 		const results = [];
 
-			for (let i = 0; i < result.length; i++) {
-				results.push([result[i].match(/(?<=(http[s]?:\/\/)?(www\.)?reddit\.[\w.]+\/r\/[\w]+\/comments\/)([\w]{6})/gi),
-					result[i].match(/(?<=(http[s]?:\/\/)?(www\.)?reddit\.[\w.]+\/r\/[\w]+\/comments\/[\w]{6}\/[\w]+\/)([\w]{7})/gi)]);
-			}
+	// 		for (let i = 0; i < result.length; i++) {
+	// 			results.push([result[i].match(/(?<=(http[s]?:\/\/)?(www\.)?reddit\.[\w.]+\/r\/[\w]+\/comments\/)([\w]{6})/gi),
+	// 				result[i].match(/(?<=(http[s]?:\/\/)?(www\.)?reddit\.[\w.]+\/r\/[\w]+\/comments\/[\w]{6}\/[\w]+\/)([\w]{7})/gi)]);
+	// 		}
 
-			try {
-				const nickname = msg.guild.members.cache.get(msg.author.id).displayName;
-				let links = `**${nickname}:** `;
+	// 		try {
+	// 			const nickname = msg.guild.members.cache.get(msg.author.id).displayName;
+	// 			let links = `**${nickname}:** `;
 
-				for (let i = 0; i < results.length; i++) {
-					links += `<https://reddit.com/comments/${results[i][0]}/_/${results[i][1]}>\n`;
-				}
+	// 			for (let i = 0; i < results.length; i++) {
+	// 				links += `<https://reddit.com/comments/${results[i][0]}/_/${results[i][1]}>\n`;
+	// 			}
 
-				msg.channel.send(links);
-			}
-			catch (e) {
-				// Log the error.
-				client.logger.log(e, 'error');
-			}
-		}
+	// 			msg.channel.send(links);
+	// 		}
+	// 		catch (e) {
+	// 			// Log the error.
+	// 			client.logger.log(e, 'error');
+	// 		}
+	// 	}
 
-		if (content.match(thread)) {
-			const result = content.match(thread);
+	// 	if (content.match(thread)) {
+	// 		const result = content.match(thread);
 
-			try {
-				const nickname = msg.guild.members.cache.get(msg.author.id).displayName;
-				let links = `**${nickname}:** `;
+	// 		try {
+	// 			const nickname = msg.guild.members.cache.get(msg.author.id).displayName;
+	// 			let links = `**${nickname}:** `;
 
-				for (let i = 0; i < result.length; i++) {
-					links += `<https://redd.it/${result[i]}>\n`;
-				}
+	// 			for (let i = 0; i < result.length; i++) {
+	// 				links += `<https://redd.it/${result[i]}>\n`;
+	// 			}
 
-				msg.channel.send(links);
-			}
-			catch (e) {
-				// Log the error.
-				client.logger.log(e, 'error');
-			}
-		}
-	}
+	// 			msg.channel.send(links);
+	// 		}
+	// 		catch (e) {
+	// 			// Log the error.
+	// 			client.logger.log(e, 'error');
+	// 		}
+	// 	}
+	// }
 });
 
 
