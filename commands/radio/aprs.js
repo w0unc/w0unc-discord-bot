@@ -1,8 +1,8 @@
 'use strict';
 
 
-// Imports 'Command' from the Discord.js Commando library.
-const { Command } = require('discord.js-commando');
+// Imports 'Command' from the Sapphire library.
+const { Command } = require('@sapphire/framework');
 
 
 // Imports the APICall module.
@@ -11,64 +11,58 @@ const APICall = require('../../modules/APICall');
 
 // Command that gets information on an APRS packet.
 module.exports = class APRS extends Command {
-	constructor(client) {
-		super(client, {
+	constructor(context, options) {
+		super(context, {
+			...options,
 			name: 'aprs',
-			group: 'radio',
-			memberName: 'aprs',
 			description: 'Gets information on an APRS packet.',
-			throttling: {
-				usages: 1,
-				duration: 5,
-			},
-			args: [
-				{
-					key: 'criteria',
-					prompt: 'Please specify an APRS packet identifier.',
-					type: 'string',
-					max: 10,
-					min: 1,
-				},
-			],
+			cooldownDelay: 5_000
 		});
 	}
 
 	// The main run function of the APRS command.
-	async run(msg, { criteria }) {
+	async messageRun(message, args) {
 		// Returns if the APRS API key is missing.
-		if (!this.client.config.aprsAPIKey) {
-			msg.reply([
+		if (!this.container.client.config.aprsAPIKey) {
+			message.reply([
 				'An error occurred while running the command: `APRS`',
 				'You shouldn\'t ever receive an error like this.',
-				`Please contact ${this.client.owners || 'the bot owner'}`,
-				`${this.client.config.invite ? `In this server: https://discord.gg/${this.client.config.invite}` : '.'}`,
+				`Please contact ${this.container.client.owners || 'the bot owner'}`,
+				`${this.container.client.config.invite ? `In this server: https://discord.gg/${this.container.client.config.invite}` : '.'}`,
 			].join('\n'));
 
 			// Log the error.
-			return this.client.logger.log('APRS API key is missing.', 'error');
+			return this.container.client.logger.log('APRS API key is missing.', 'error');
 		}
 
-		criteria = criteria.toUpperCase();
+		// Arguments.
+		const criteria = await args.pick('string').catch(() => { return message.reply('Please specify an APRS packet identifier.') });
+		const searchCriteria = criteria.toUpperCase();
+
+		// Criteria validation.
+		if (searchCriteria < 1 || searchCriteria > 10) {
+			return message.reply('Criteria must be between 1 and 10 characters.');
+		}
 
 		// API call options.
 		const options = {
 			host: 'api.aprs.fi',
-			path: `/api/get?format=json&what=loc&apikey=${this.client.config.aprsAPIKey}&name=${criteria}`,
+			path: `/api/get?format=json&what=loc&apikey=${this.container.client.config.aprsAPIKey}&name=${searchCriteria}`,
 		};
 
 		// API call.
 		APICall.call(options, (err, res) => {
 			if (err) {
 				// Reply to the user if error.
-				msg.reply([
+				message.reply([
 					'An error occurred while running the command: `APRS`',
 					'You shouldn\'t ever receive an error like this.',
-					`Please contact ${this.client.owners || 'the bot owner'}`,
-					`${this.client.config.invite ? `In this server: https://discord.gg/${this.client.config.invite}` : ''}`,
+					`Please contact ${this.container.client.owners || 'the bot owner'}`,
+					`${this.container.client.config.invite ? `In this server: https://discord.gg/${this.container.client.config.invite}` : ''}`,
 				].join('\n'));
 
 				// Log the error.
-				return this.client.logger.log(err, 'error');
+				return this.container.client.logger.log(err, 'error');
 			}
 
 			// Parse the data into JSON.
@@ -80,12 +74,12 @@ module.exports = class APRS extends Command {
 				msg.reply([
 					'An error occurred while running the command: `APRS`',
 					'You shouldn\'t ever receive an error like this.',
-					`Please contact ${this.client.owners || 'the bot owner'}`,
-					`${this.client.config.invite ? `In this server: https://discord.gg/${this.client.config.invite}` : ''}`,
+					`Please contact ${this.container.client.owners || 'the bot owner'}`,
+					`${this.container.client.config.invite ? `In this server: https://discord.gg/${this.container.client.config.invite}` : ''}`,
 				].join('\n'));
 
 				// Log the error.
-				return this.client.logger.log('Invalid APRS API Key', 'error');
+				return this.container.client.logger.log('Invalid APRS API Key', 'error');
 			}
 
 			// Reply to the user if error.
@@ -104,7 +98,11 @@ module.exports = class APRS extends Command {
 			}
 
 			// Reply to the user.
-			msg.reply(aprs, { code: 'asciidoc' });
+			message.reply([
+				'\`\`\`asciidoc',
+				`${aprs}`,
+				'\`\`\`',
+			].join('\n'));
 		});
 	}
 };

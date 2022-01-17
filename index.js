@@ -18,9 +18,8 @@ const { open } = require('sqlite');
 const discord = require('discord.js').version;
 
 
-// Imports 'CommandoClient', 'SQLiteProvider', and 'version' from the Discord.js Commando library.
-const { CommandoClient, SQLiteProvider } = require('discord.js-commando');
-const commando = require('discord.js-commando').version;
+// Imports 'SapphireClient' from the Sapphire library.
+const { SapphireClient } = require('@sapphire/framework');
 
 
 // Imports the Logger module.
@@ -43,36 +42,9 @@ if (!fs.existsSync('./db')) {
 }
 
 
-// Creates a Discord.js Commando client.
-const client = new CommandoClient({
-	owner: config.owner,
-	commandPrefix: config.commandPrefix,
-	disableEveryone: config.disableEveryone,
-});
-
-
-// Creates the command groups.
-client.registry
-	.registerDefaults()
-	.registerGroups([
-		['debug', 'Debug'],
-		['moderate', 'Moderate'],
-		['music', 'Music'],
-		['radio', 'Radio'],
-		['time', 'Time'],
-		['tools', 'Tools'],
-	])
-	.registerCommandsIn(path.join(__dirname, 'commands'));
-
-
-// Creates a database for storing settings.
-client.setProvider(
-	open({
-		filename: './db/bot.db',
-		driver: sqlite3.Database,
-	}).then((db) => new SQLiteProvider(db)),
-);
-
+// Creates the Sapphire Client.
+const client = new SapphireClient({ intents: ['GUILDS', 'GUILD_MESSAGES'] });
+console.log(client);
 
 // Attaches the config file to the bot.
 client.config = config;
@@ -96,13 +68,12 @@ client.on('ready', () => {
 		`Users: ${client.users.cache.filter(user => !user.bot).size}`,
 		`Node.js: ${process.version}`,
 		`Discord.js: v${discord}`,
-		`Commando: v${commando}`,
 	].join(' | '), 'start');
 });
 
 
 // Message event.
-client.on('message', (msg) => {
+client.on('messageCreate', (msg) => {
 	// Return if author is a bot.
 	if (msg.author.bot) {
 		return;
@@ -110,56 +81,56 @@ client.on('message', (msg) => {
 
 	const content = msg.content;
 
-	// Amazon.
-	if (content.match(/amazon/gi)) {
-		const pattern = new RegExp(/(?<=(http[s]?:\/\/)?(www\.)?amazon\.[\w.]+\/([\w-]+\/|)(dp|gp)\/)([\w]{10})/gi);
+	// // Amazon.
+	// if (content.match(/amazon/gi)) {
+	// 	const pattern = new RegExp(/(?<=(http[s]?:\/\/)?(www\.)?amazon\.[\w.]+\/([\w-]+\/|)(dp|gp)\/)([\w]{10})/gi);
 
-		if (content.match(pattern)) {
-			const result = content.match(pattern);
+	// 	if (content.match(pattern)) {
+	// 		const result = content.match(pattern);
 
-			try {
-				const nickname = msg.guild.members.cache.get(msg.author.id).displayName;
-				console.log(nickname);
-				let links = `**${nickname}:** `;
+	// 		try {
+	// 			const nickname = msg.guild.members.cache.get(msg.author.id).displayName;
+	// 			console.log(nickname);
+	// 			let links = `**${nickname}:** `;
 
-				for (let i = 0; i < result.length; i++) {
-					links += `<https://amzn.com/${result[i]}>\n`;
-				}
+	// 			for (let i = 0; i < result.length; i++) {
+	// 				links += `<https://amzn.com/${result[i]}>\n`;
+	// 			}
 
-				msg.channel.send(links);
-			}
-			catch (e) {
-				// Log the error.
-				client.logger.log(e, 'error');
-			}
-		}
-	}
+	// 			msg.channel.send(links);
+	// 		}
+	// 		catch (e) {
+	// 			// Log the error.
+	// 			client.logger.log(e, 'error');
+	// 		}
+	// 	}
+	// }
 
-	// eBay.
-	if (content.match(/ebay/gi)) {
-		const pattern = new RegExp(/(?<=(http[s]?:\/\/)?(www\.)?ebay\.[\w.]+\/itm\/[\w-]+\/)([\w]{12})/gi);
+	// // eBay.
+	// if (content.match(/ebay/gi)) {
+	// 	const pattern = new RegExp(/(?<=(http[s]?:\/\/)?(www\.)?ebay\.[\w.]+\/itm\/[\w-]+\/)([\w]{12})/gi);
 
-		if (content.match(pattern)) {
-			const result = content.match(pattern);
+	// 	if (content.match(pattern)) {
+	// 		const result = content.match(pattern);
 
-			try {
-				const nickname = msg.guild.members.cache.get(msg.author.id).displayName;
-				let links = `**${nickname}:** `;
+	// 		try {
+	// 			const nickname = msg.guild.members.cache.get(msg.author.id).displayName;
+	// 			let links = `**${nickname}:** `;
 
-				for (let i = 0; i < result.length; i++) {
-					links += `<https://ebay.com/itm/${result[i]}>\n`;
-				}
+	// 			for (let i = 0; i < result.length; i++) {
+	// 				links += `<https://ebay.com/itm/${result[i]}>\n`;
+	// 			}
 
-				msg.channel.send(links);
-			}
-			catch (e) {
-				// Log the error.
-				client.logger.log(e, 'error');
-			}
-		}
-	}
+	// 			msg.channel.send(links);
+	// 		}
+	// 		catch (e) {
+	// 			// Log the error.
+	// 			client.logger.log(e, 'error');
+	// 		}
+	// 	}
+	// }
 
-	// Reddit.
+	// // Reddit.
 	// if (content.match(/reddit/gi)) {
 	// 	const comment = new RegExp(/(http[s]?:\/\/)?(www\.)?reddit\.[\w.]+\/r\/[\w]+\/comments\/[\w]{6}\/[\w]+\/[\w]{7}/gi);
 	// 	const thread = new RegExp(/(?<=(http[s]?:\/\/)?(www\.)?reddit\.[\w.]+\/r\/[\w]+\/comments\/)([\w]{6})(?=\/[\w]+[/]?([^\S]+|$))/gi);
@@ -208,35 +179,6 @@ client.on('message', (msg) => {
 	// 		}
 	// 	}
 	// }
-});
-
-
-// Command event.
-client.on('commandRun', (cmd, p, msg, args) => {
-	if (msg.guild) {
-		// If the command is run in a guild.
-		client.logger.log([
-			`Server: ${msg.guild.name} (${msg.guild.id})`,
-			`Channel: ${msg.channel.name} (${msg.channel.id})`,
-			`User: ${msg.author.tag} (${msg.author.id})`,
-			`Command: ${cmd.name}`,
-			`Arguments: ${Object.values(args).join(', ')}`,
-		].join(' | '), 'cmdsv');
-	}
-	else {
-		// If the command is run in a DM.
-		client.logger.log([
-			`User: ${msg.author.tag} (${msg.author.id})`,
-			`Command: ${cmd.name}`,
-			`Arguments: ${Object.values(args).join(', ')}`,
-		].join(' | '), 'cmddm');
-	}
-});
-
-
-// Command error event.
-client.on('commandError', (cmd, err) => {
-	client.logger.log(err.stack, 'error');
 });
 
 

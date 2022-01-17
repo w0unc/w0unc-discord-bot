@@ -1,28 +1,24 @@
 'use strict';
 
 
-// Imports 'Command' from the Discord.js Commando library.
-const { Command } = require('discord.js-commando');
+// Imports 'Command' from the Sapphire library.
+const { Command } = require('@sapphire/framework');
 
 
 // Command that asks the Magic 8-Ball a question.
 module.exports = class Magic8Ball extends Command {
-	constructor(client) {
-		super(client, {
+	constructor(context, options) {
+		super(context, {
+			...options,
 			name: 'magic8ball',
 			aliases: ['m8ball', 'magiceight', '8ball'],
-			group: 'tools',
-			memberName: 'magic8ball',
 			description: 'Asks the 8-Ball a question.',
-			throttling: {
-				usages: 1,
-				duration: 5,
-			},
+			cooldownDelay: 5_000
 		});
 	}
 
 	// The main run function of the Magic8Ball command.
-	async run(msg) {
+	async messageRun(message) {
 		// Magic 8-Ball responses.
 		const responses = [
 			'It is certain',
@@ -48,6 +44,6 @@ module.exports = class Magic8Ball extends Command {
 		];
 
 		// Reply to the user.
-		msg.reply(responses[Math.floor(Math.random() * responses.length)]);
+		message.reply(responses[Math.floor(Math.random() * responses.length)]);
 	}
-};
+}

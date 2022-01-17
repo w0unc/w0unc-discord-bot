@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  w0unc-discord-bot:
+    build: .
+    volumes:
+      - .:/usr/app
+      - /usr/app/node_modules
+    command: node .

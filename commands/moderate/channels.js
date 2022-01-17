@@ -1,8 +1,8 @@
 'use strict';
 
 
-// Imports 'Command' from the Discord.js Commando library.
-const { Command } = require('discord.js-commando');
+// Imports 'Command' and 'CommandOptionsRunTypeEnum' from the Sapphire library.
+const { Command, CommandOptionsRunTypeEnum } = require('@sapphire/framework');
 
 
 // Command that lists the channels the bot is currently in.

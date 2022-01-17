@@ -1,57 +1,54 @@
 'use strict';
 
 
-// Imports 'Command' from the Discord.js Commando library.
-const { Command } = require('discord.js-commando');
+// Imports 'Command' and 'CommandOptionsRunTypeEnum' from the Sapphire library.
+const { Command, CommandOptionsRunTypeEnum } = require('@sapphire/framework');
 
 
 // Command that bans a member from the server.
 module.exports = class Ban extends Command {
-	constructor(client) {
-		super(client, {
+	constructor(context, options) {
+		super(context, {
+			...options,
 			name: 'ban',
-			group: 'moderate',
-			memberName: 'ban',
 			description: 'Bans a member from the server.',
-			guildOnly: true,
-			clientPermissions: ['BAN_MEMBERS'],
-			userPermissions: ['BAN_MEMBERS'],
-			throttling: {
-				usages: 1,
-				duration: 1,
-			},
-			args: [
-				{
-					key: 'member',
-					prompt: 'Please specify the member to ban from the server.',
-					type: 'member',
-				},
-				{
-					key: 'days',
-					prompt: 'Please specify the number of days worth of messages to delete.',
-					type: 'integer',
-					max: 7,
-					min: 0,
-				},
-				{
-					key: 'reason',
-					prompt: 'Please specify the reason for banning the member.',
-					type: 'string',
-					max: 100,
-					min: 1,
-				},
-			],
+			runIn: CommandOptionsRunTypeEnum.GuildAny,
+			requiredClientPermissions: ['BAN_MEMBERS'],
+			requiredUserPermissions: ['BAN_MEMBERS'],
+			options: ['days', 'reason'],
+			cooldownDelay: 5_000
 		});
 	}
 
 	// The main run function of the Ban command.
-	async run(msg, { member, days, reason }) {
+	async messageRun(message, args) {
+		// Arguments.
+		const member = await args.pick('member').catch(() => null);
+		const days = await args.getOption('days');
+		const reason = await args.getOption('reason');
+
+		// Member to ban validation.
+		if (!member) {
+			return message.reply('You must provide a member to ban.');
+		}
+
+		// Number of days to ban validation.
+		if (days > 7) {
+			return message.reply('The number of days to ban must be less than or equal to 7.');
+		}
+
+		// Ban reason validation.
+		if (reason > 2000) {
+			return message.reply('Ban reason must be 2000 or less characters.');
+		}
+		console.log(days);
+		console.log(reason);
 		// Bans the member from the server.
 		member.ban({ days: days, reason: reason })
 			// Reply to the user.
-			.then(ban => { msg.reply(`${ban.displayName} has been banned from the server.`); })
+			.then(ban => { message.reply(`${ban.displayName} has been banned from the server.`); })
 
 			// Reply to the user if error.
-			.catch(() => { msg.reply('I cannot do that on a member with a role higher than or equal to my current highest role.'); });
+			.catch(() => { message.reply('Unable to ban the user from the server.'); });
 	}
 };
