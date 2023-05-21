@@ -1,5 +1,5 @@
 /**
- * @file File for the 'bandchart' command.
+ * @file File for the 'phoneticschart' command.
  */
 
 
@@ -17,12 +17,12 @@ module.exports = {
 
 
 	data: new SlashCommandBuilder()
-		.setName('bandchart')
-		.setDescription('Shows the current amateur radio band chart.'),
+		.setName('phoneticschart')
+		.setDescription('Shows the NATO phonetics chart.'),
 
 
 	async execute(interaction) {
-		const file = new AttachmentBuilder('./media/bandchart.jpg');
+		const file = new AttachmentBuilder('./media/phoneticschart.jpg');
 		await interaction.reply({ files: [file] });
 	},
 

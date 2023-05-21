@@ -1,5 +1,5 @@
 /**
- * @file File for the 'callsign' command
+ * @file File for the 'ham' command
  */
 
 
@@ -18,7 +18,7 @@ module.exports = {
 
 
 	data: new SlashCommandBuilder()
-		.setName('callsign')
+		.setName('ham')
 		.setDescription('Replies with ham radio callsign information.')
 		.addStringOption((option) =>
 			option.setName('callsign')

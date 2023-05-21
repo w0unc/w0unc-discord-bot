@@ -1,110 +1,79 @@
-'use strict';
+/**
+ * @file File for the 'aprs' command.
+ */
 
 
-// Imports 'Command' from the Discord.js Commando library.
-const { Command } = require('discord.js-commando');
 
 
-// Imports the APICall module.
-const APICall = require('../../modules/APICall');
+const https = require('https');
+const { SlashCommandBuilder, codeBlock } = require('discord.js');
+const { aprsAPIKey } = require('../../config.json');
 
 
-// Command that gets information on an APRS packet.
-module.exports = class APRS extends Command {
-	constructor(client) {
-		super(client, {
-			name: 'aprs',
-			group: 'radio',
-			memberName: 'aprs',
-			description: 'Gets information on an APRS packet.',
-			throttling: {
-				usages: 1,
-				duration: 5,
-			},
-			args: [
-				{
-					key: 'criteria',
-					prompt: 'Please specify an APRS packet identifier.',
-					type: 'string',
-					max: 10,
-					min: 1,
-				},
-			],
-		});
-	}
 
-	// The main run function of the APRS command.
-	async run(msg, { criteria }) {
-		// Returns if the APRS API key is missing.
-		if (!this.client.config.aprsAPIKey) {
-			msg.reply([
-				'An error occurred while running the command: `APRS`',
-				'You shouldn\'t ever receive an error like this.',
-				`Please contact ${this.client.owners || 'the bot owner'}`,
-				`${this.client.config.invite ? `In this server: https://discord.gg/${this.client.config.invite}` : '.'}`,
-			].join('\n'));
 
-			// Log the error.
-			return this.client.logger.log('APRS API key is missing.', 'error');
-		}
+module.exports = {
 
-		criteria = criteria.toUpperCase();
 
-		// API call options.
+	cooldown: 1,
+
+
+	data: new SlashCommandBuilder()
+		.setName('aprs')
+		.setDescription('Fetches information from the aprs.fi API.')
+		.addStringOption((option) =>
+			option.setName('name')
+				.setDescription('The name to search for.')
+				.setRequired(true))
+		.addStringOption((option) =>
+			option.setName('what')
+				.setDescription('The name to search for.')
+				.addChoices(
+					{ name: 'loc', value: 'loc' },
+					{ name: 'msg', value: 'msg' },
+					{ name: 'wx', value: 'wx' },
+				)),
+
+
+	async execute(interaction) {
+		await interaction.deferReply();
+		const name = interaction.options.getString('name');
+
 		const options = {
 			host: 'api.aprs.fi',
-			path: `/api/get?format=json&what=loc&apikey=${this.client.config.aprsAPIKey}&name=${criteria}`,
+			path: `/api/get?name=${name}&what=loc&apikey=${aprsAPIKey}&format=json`,
+			timeout: 5000,
 		};
 
-		// API call.
-		APICall.call(options, (err, res) => {
-			if (err) {
-				// Reply to the user if error.
-				msg.reply([
-					'An error occurred while running the command: `APRS`',
-					'You shouldn\'t ever receive an error like this.',
-					`Please contact ${this.client.owners || 'the bot owner'}`,
-					`${this.client.config.invite ? `In this server: https://discord.gg/${this.client.config.invite}` : ''}`,
-				].join('\n'));
+		await https.get(options, (res) => {
+			const body = [];
 
-				// Log the error.
-				return this.client.logger.log(err, 'error');
-			}
+			res.on('data', (chunk) => {
+				body.push(chunk);
+			});
 
-			// Parse the data into JSON.
-			let data = JSON.parse(res);
+			res.on('end', async() => {
+				const data = JSON.parse(body);
 
-			// Reply to the user if error.
-			if (data.code === 'apikey-invalid' || data.code === 'apikey-wrong') {
-				// Reply to the user if error.
-				msg.reply([
-					'An error occurred while running the command: `APRS`',
-					'You shouldn\'t ever receive an error like this.',
-					`Please contact ${this.client.owners || 'the bot owner'}`,
-					`${this.client.config.invite ? `In this server: https://discord.gg/${this.client.config.invite}` : ''}`,
-				].join('\n'));
+				if (data.found === 0) return await interaction.editReply(`Found no results for ${bold(name)}.`);
 
-				// Log the error.
-				return this.client.logger.log('Invalid APRS API Key', 'error');
-			}
+				const entry = data.entries[0];
+				const longest = Object.keys(entry).reduce((a, b) => a > b.length ? a : b.length, 0);
+				const aprs = [];
 
-			// Reply to the user if error.
-			if (data.found === 0) {
-				return msg.reply('There were no results found given that criteria.');
-			}
+				for (const [key, value] of Object.entries(entry)) {
+					aprs.push(`• ${key}${' '.repeat(longest - key.length)} :: ${value}`);
+				}
 
-			// Gets the longest key from the JSON.
-			data = data.entries[0];
-			const longest = Object.keys(data).reduce((long, str) => Math.max(long, str.length), 0);
-
-			// Formats the data.
-			let aprs = '';
-			for (const key in data) {
-				aprs += `• ${key}${' '.repeat(longest - key.length)} :: ${data[key]}\n`;
-			}
-
-			// Reply to the user.
-			msg.reply(aprs, { code: 'asciidoc' });
+				await interaction.editReply(codeBlock('asciidoc', aprs.join('\n')));
+			});
+		}).on('error', async(err) => {
+			console.log('Error: ', err.message);
+			await interaction.editReply('Unable to complete request due to an API error.');
+		}).on('timeout', async() => {
+			await interaction.editReply('Timed out waiting for API response.');
 		});
-	}
+	},
+
+
 };

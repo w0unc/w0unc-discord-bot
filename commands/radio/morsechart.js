@@ -1,29 +1,30 @@
-'use strict';
+/**
+ * @file File for the 'morsechart' command.
+ */
 
 
-// Imports 'Command' from the Discord.js Commando library.
-const { Command } = require('discord.js-commando');
 
 
-// Command that gets the Morse Chart.
-module.exports = class MorseChart extends Command {
-	constructor(client) {
-		super(client, {
-			name: 'morsechart',
-			aliases: ['mchart'],
-			group: 'radio',
-			memberName: 'morsechart',
-			description: 'Gets the Morse Chart.',
-			throttling: {
-				usages: 1,
-				duration: 5,
-			},
-		});
-	}
+const { AttachmentBuilder, SlashCommandBuilder } = require('discord.js');
 
-	// The main run function of the MorseChart command.
-	async run(msg) {
-		// Reply to the user.
-		return msg.reply({ files: ['media/morsechart.jpg'] });
-	}
+
+
+
+module.exports = {
+
+
+	cooldown: 60,
+
+
+	data: new SlashCommandBuilder()
+		.setName('morsechart')
+		.setDescription('Shows the international morse code chart.'),
+
+
+	async execute(interaction) {
+		const file = new AttachmentBuilder('./media/morsechart.jpg');
+		await interaction.reply({ files: [file] });
+	},
+
+
 };
